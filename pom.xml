@@ -38,5 +38,13 @@
             </resource>
         </resources>
     </build>
+         
+    <distributionManagement>
+        <repository>
+            <id>github</id>
+            <name>GitHub Apache Maven Packages</name>
+            <url>https://maven.pkg.github.com/TrollyLoki/MiniGameLibrary</url>
+        </repository>
+    </distributionManagement>
 
 </project>
