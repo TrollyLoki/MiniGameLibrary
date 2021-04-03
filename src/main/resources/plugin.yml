@@ -1,0 +1,10 @@
+name: MiniGameLibrary
+main: net.trollyloki.minigames.library.MiniGameLibraryPlugin
+version: ${project.version}
+api-version: 1.16
+
+author: TrollyLoki
+
+commands:
+  party:
+    aliases: [p]
