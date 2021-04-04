@@ -15,6 +15,7 @@ Maven dependency: [![](https://jitpack.io/v/TrollyLoki/MiniGameLibrary.svg)](htt
         <groupId>com.github.TrollyLoki</groupId>
         <artifactId>MiniGameLibrary</artifactId>
         <version>Tag</version>
+        <scope>provided</scope>
     </dependency>
 </dependencies>
 ```
