@@ -200,6 +200,13 @@ public class MiniGameManager implements Listener {
     }
 
     @EventHandler
+    public void onPlayerFoodLevelChange(FoodLevelChangeEvent event) {
+        Game game = getGame(event.getEntity().getUniqueId());
+        if (game != null)
+            game.onPlayerFoodLevelChange(event);
+    }
+
+    @EventHandler
     public void onPlayerInteract(PlayerInteractEvent event) {
         Game game = getGame(event.getPlayer().getUniqueId());
         if (game != null)

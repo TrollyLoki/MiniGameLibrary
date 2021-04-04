@@ -220,6 +220,15 @@ public abstract class Game extends BukkitRunnable implements AutoCloseable {
     }
 
     /**
+     * This will be called when a player in this game's hunger changes
+     *
+     * @param event FoodLevelChangeEvent
+     */
+    public void onPlayerFoodLevelChange(FoodLevelChangeEvent event) {
+
+    }
+
+    /**
      * This will be called when a player in this game interacts with something
      *
      * @param event PlayerInteractEvent
