@@ -19,6 +19,8 @@ import java.util.*;
 
 public class PartyCommand implements CommandExecutor, TabCompleter {
 
+    public static final String HIJACK_PERMISSION = "party.hijack";
+
     private final MiniGameManager manager;
 
     public PartyCommand(MiniGameManager manager) {
@@ -96,6 +98,28 @@ public class PartyCommand implements CommandExecutor, TabCompleter {
 
             }
 
+            else if (args[0].equalsIgnoreCase("disband")) {
+
+                if (party == null) {
+                    sender.sendMessage(ChatColor.RED + "You are not in a party");
+                    return false;
+                }
+
+                if (!party.isModerator(player.getUniqueId())) {
+                    sender.sendMessage(ChatColor.RED + "Only party moderators can disband the party");
+                    return false;
+                }
+
+                for (UUID uuid : party.getPlayers()) {
+                    party.remove(uuid);
+                    Player removee = manager.getPlugin().getServer().getPlayer(uuid);
+                    if (removee != null)
+                        display(removee, ChatColor.YELLOW + player.getName() + " disbanded the party");
+                }
+                return true;
+
+            }
+
             else if (args[0].equalsIgnoreCase("join")) {
 
                 if (args.length > 1) {
@@ -126,6 +150,36 @@ public class PartyCommand implements CommandExecutor, TabCompleter {
                 }
 
                 sender.sendMessage(ChatColor.RED + "Usage: /" + label + " join <player>");
+                return false;
+
+            }
+
+            else if (args[0].equalsIgnoreCase("hijack") && sender.hasPermission("party.hijack")) {
+
+                if (args.length > 1) {
+
+                    if (party != null) {
+                        sender.sendMessage(ChatColor.RED + "You are already in a party");
+                        return false;
+                    }
+
+                    OfflinePlayer join = getOfflinePlayer(args[1]);
+                    Party joinParty = join != null ? manager.getParty(join.getUniqueId()) : null;
+                    if (joinParty == null) { // player is not found or not in a party
+                        sender.sendMessage(ChatColor.RED + (join != null ? join.getName() : args[1]) + " is not in a party");
+                        return false;
+                    } else {
+
+                        joinParty.add(player.getUniqueId());
+                        joinParty.promote(player.getUniqueId());
+                        display(joinParty, ChatColor.YELLOW + player.getName() + " hijacked the party");
+                        return true;
+
+                    }
+
+                }
+
+                sender.sendMessage(ChatColor.RED + "Usage: /" + label + " hijack <player>");
                 return false;
 
             }
@@ -264,7 +318,11 @@ public class PartyCommand implements CommandExecutor, TabCompleter {
 
         }
 
-        sender.sendMessage(ChatColor.RED + "Usage: /" + label + " <list|add|remove|join|leave|promote|demote>");
+        String usage = ChatColor.RED + "Usage: /" + label + " <list|add|remove|disband|join";
+        if (sender.hasPermission(HIJACK_PERMISSION))
+            usage += "|hijack";
+        usage += "|leave|promote|demote>";
+        sender.sendMessage(usage);
         return false;
 
     }
@@ -275,6 +333,7 @@ public class PartyCommand implements CommandExecutor, TabCompleter {
         if (args.length > 1) {
 
             if (args[0].equalsIgnoreCase("list")
+                    || args[0].equalsIgnoreCase("disband")
                     || args[0].equalsIgnoreCase("leave")) {
                 return new ArrayList<>();
             }
@@ -282,6 +341,7 @@ public class PartyCommand implements CommandExecutor, TabCompleter {
             else if (args[0].equalsIgnoreCase("add")
                     || args[0].equalsIgnoreCase("remove")
                     || args[0].equalsIgnoreCase("join")
+                    || (args[0].equalsIgnoreCase("hijack") && sender.hasPermission(HIJACK_PERMISSION))
                     || args[0].equalsIgnoreCase("promote")
                     || args[0].equalsIgnoreCase("demote")) {
 
@@ -299,7 +359,10 @@ public class PartyCommand implements CommandExecutor, TabCompleter {
         list.add("list");
         list.add("add");
         list.add("remove");
+        list.add("disband");
         list.add("join");
+        if (sender.hasPermission(HIJACK_PERMISSION))
+            list.add("hijack");
         list.add("leave");
         list.add("promote");
         list.add("demote");
